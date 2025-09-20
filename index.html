@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>Joyeux Anniversaire 🎉</title>
+  <style>
+    :root{--accent:#ff4081;--accent2:#ffb347}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#ffe0e9 0%, #fff7f0 100%);font-family:Inter,Arial,sans-serif;overflow:hidden}
+
+    .card{width:92%;max-width:420px;border-radius:20px;padding:24px;background:rgba(255,255,255,0.95);box-shadow:0 6px 20px rgba(0,0,0,0.1);text-align:center;position:relative;z-index:1}
+
+    .title{font-size:1.8rem;color:#ff4081;margin-bottom:12px}
+    .name{font-size:1.4rem;margin:10px 0;color:#ff4081;line-height:1.3}
+    .text{color:#374151;margin-top:8px;font-size:1rem;line-height:1.4}
+
+    button{margin-top:18px;width:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border:none;padding:16px;border-radius:14px;color:#fff;font-size:1.1rem;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.15);touch-action:manipulation}
+    button:active{transform:scale(0.98)}
+
+    canvas{position:absolute;inset:0;z-index:0}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1 class="title">🎂 Carte d'anniversaire 🎉</h1>
+    <p id="message" class="name">Clique sur le bouton ci-dessous 👇</p>
+    <p id="line" class="text"></p>
+    <button id="wishBtn">Surprise ✨</button>
+  </div>
+
+  <canvas id="stars"></canvas>
+  <audio id="bgMusic" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_3e6b8f0a27.mp3?filename=happy-birthday-122846.mp3" preload="none"></audio>
+
+  <script>
+    const canvas = document.getElementById('stars');
+    const ctx = canvas.getContext('2d');
+    let w = canvas.width = window.innerWidth;
+    let h = canvas.height = window.innerHeight;
+    window.addEventListener('resize', ()=>{w=canvas.width=window.innerWidth;h=canvas.height=window.innerHeight});
+
+    function rand(min,max){return Math.random()*(max-min)+min}
+
+    // Etoiles scintillantes
+    class Star{
+      constructor(){this.reset()}
+      reset(){this.x=rand(0,w);this.y=rand(0,h);this.size=rand(1,2);this.alpha=rand(0.3,1);this.fade=rand(0.005,0.02)}
+      update(){this.alpha+=this.fade;if(this.alpha<=0.3||this.alpha>=1)this.fade*=-1}
+      draw(){ctx.globalAlpha=this.alpha;ctx.fillStyle="#fff";ctx.beginPath();ctx.arc(this.x,this.y,this.size,0,Math.PI*2);ctx.fill()}
+    }
+
+    let stars=[];for(let i=0;i<60;i++)stars.push(new Star());
+    function anim(){ctx.clearRect(0,0,w,h);for(let s of stars){s.update();s.draw()}for(let i=particles.length-1;i>=0;i--){let p=particles[i];p.update();p.draw();if(p.life<=0)particles.splice(i,1)}requestAnimationFrame(anim)}
+
+    // Feu d’artifice
+    class Particle{
+      constructor(x,y,color){this.x=x;this.y=y;this.vx=rand(-3,3);this.vy=rand(-3,3);this.life=rand(40,80);this.size=rand(2,4);this.color=color}
+      update(){this.x+=this.vx;this.y+=this.vy;this.vy+=0.05;this.life--}
+      draw(){ctx.globalAlpha=Math.max(this.life/80,0);ctx.fillStyle=this.color;ctx.beginPath();ctx.arc(this.x,this.y,this.size,0,Math.PI*2);ctx.fill()}
+    }
+
+    let particles=[];
+    function fireworks(){
+      const cx=rand(w*0.3,w*0.7),cy=rand(h*0.2,h*0.5);
+      for(let i=0;i<50;i++){
+        const color=`hsl(${~~rand(0,360)},80%,60%)`;
+        particles.push(new Particle(cx,cy,color));
+      }
+    }
+
+    anim();
+
+    // Bouton
+    const btn=document.getElementById('wishBtn');
+    const message=document.getElementById('message');
+    const line=document.getElementById('line');
+    const music=document.getElementById('bgMusic');
+
+    btn.addEventListener('click',()=>{
+      message.textContent="Joyeux Anniversaire AMIRA 🎂";
+      line.textContent="Que ta journée soit remplie de joie et de magie ✨";
+      fireworks();
+      music.play();
+    });
+  </script>
+</body>
+</html>
